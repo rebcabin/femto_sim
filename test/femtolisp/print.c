@@ -97,7 +97,7 @@ void print_traverse(value_t v)
         print_traverse(f->env);
     }
     else {
-        assert(iscvalue(v));
+        assert(iscvalue(v) || iscprim(v));
         cvalue_t *cv = (cvalue_t*)ptr(v);
         // don't consider shared references to ""
         if (!cv_isstr(cv) || cv_len(cv)!=0)

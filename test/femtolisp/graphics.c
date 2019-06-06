@@ -30,8 +30,8 @@ typedef struct GL_Context
 #define SHADED_CUBE
 
 static SDLTest_CommonState *state;
-static SDL_GLContext context;
-static GL_Context ctx;
+static SDL_GLContext sdl_glcontext; // of type void*; see SDL_video.h
+static GL_Context glcontext;
 
 static int LoadContext(GL_Context * data)
 {
@@ -60,12 +60,14 @@ static int LoadContext(GL_Context * data)
     return 0;
 }
 
+
+
 static void
 close()
 {
-    if (context) {
+    if (sdl_glcontext) {
         /* SDL_GL_MakeCurrent(0, NULL); *//* doesn't do anything */
-        SDL_GL_DeleteContext(context);
+        SDL_GL_DeleteContext(sdl_glcontext);
     }
     SDLTest_CommonQuit(state);
 }
@@ -103,107 +105,107 @@ Render()
     };
 
     /* Do our drawing, too. */
-    ctx.glClearColor(0.0, 0.0, 0.0, 1.0);
-    ctx.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glcontext.glClearColor(0.0, 0.0, 0.0, 1.0);
+    glcontext.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    ctx.glBegin(GL_QUADS);
+    glcontext.glBegin(GL_QUADS);
 
 #ifdef SHADED_CUBE
-    ctx.glColor3fv(color[0]);
-    ctx.glVertex3fv(cube[0]);
-    ctx.glColor3fv(color[1]);
-    ctx.glVertex3fv(cube[1]);
-    ctx.glColor3fv(color[2]);
-    ctx.glVertex3fv(cube[2]);
-    ctx.glColor3fv(color[3]);
-    ctx.glVertex3fv(cube[3]);
+    glcontext.glColor3fv(color[0]);
+    glcontext.glVertex3fv(cube[0]);
+    glcontext.glColor3fv(color[1]);
+    glcontext.glVertex3fv(cube[1]);
+    glcontext.glColor3fv(color[2]);
+    glcontext.glVertex3fv(cube[2]);
+    glcontext.glColor3fv(color[3]);
+    glcontext.glVertex3fv(cube[3]);
 
-    ctx.glColor3fv(color[3]);
-    ctx.glVertex3fv(cube[3]);
-    ctx.glColor3fv(color[4]);
-    ctx.glVertex3fv(cube[4]);
-    ctx.glColor3fv(color[7]);
-    ctx.glVertex3fv(cube[7]);
-    ctx.glColor3fv(color[2]);
-    ctx.glVertex3fv(cube[2]);
+    glcontext.glColor3fv(color[3]);
+    glcontext.glVertex3fv(cube[3]);
+    glcontext.glColor3fv(color[4]);
+    glcontext.glVertex3fv(cube[4]);
+    glcontext.glColor3fv(color[7]);
+    glcontext.glVertex3fv(cube[7]);
+    glcontext.glColor3fv(color[2]);
+    glcontext.glVertex3fv(cube[2]);
 
-    ctx.glColor3fv(color[0]);
-    ctx.glVertex3fv(cube[0]);
-    ctx.glColor3fv(color[5]);
-    ctx.glVertex3fv(cube[5]);
-    ctx.glColor3fv(color[6]);
-    ctx.glVertex3fv(cube[6]);
-    ctx.glColor3fv(color[1]);
-    ctx.glVertex3fv(cube[1]);
+    glcontext.glColor3fv(color[0]);
+    glcontext.glVertex3fv(cube[0]);
+    glcontext.glColor3fv(color[5]);
+    glcontext.glVertex3fv(cube[5]);
+    glcontext.glColor3fv(color[6]);
+    glcontext.glVertex3fv(cube[6]);
+    glcontext.glColor3fv(color[1]);
+    glcontext.glVertex3fv(cube[1]);
 
-    ctx.glColor3fv(color[5]);
-    ctx.glVertex3fv(cube[5]);
-    ctx.glColor3fv(color[4]);
-    ctx.glVertex3fv(cube[4]);
-    ctx.glColor3fv(color[7]);
-    ctx.glVertex3fv(cube[7]);
-    ctx.glColor3fv(color[6]);
-    ctx.glVertex3fv(cube[6]);
+    glcontext.glColor3fv(color[5]);
+    glcontext.glVertex3fv(cube[5]);
+    glcontext.glColor3fv(color[4]);
+    glcontext.glVertex3fv(cube[4]);
+    glcontext.glColor3fv(color[7]);
+    glcontext.glVertex3fv(cube[7]);
+    glcontext.glColor3fv(color[6]);
+    glcontext.glVertex3fv(cube[6]);
 
-    ctx.glColor3fv(color[5]);
-    ctx.glVertex3fv(cube[5]);
-    ctx.glColor3fv(color[0]);
-    ctx.glVertex3fv(cube[0]);
-    ctx.glColor3fv(color[3]);
-    ctx.glVertex3fv(cube[3]);
-    ctx.glColor3fv(color[4]);
-    ctx.glVertex3fv(cube[4]);
+    glcontext.glColor3fv(color[5]);
+    glcontext.glVertex3fv(cube[5]);
+    glcontext.glColor3fv(color[0]);
+    glcontext.glVertex3fv(cube[0]);
+    glcontext.glColor3fv(color[3]);
+    glcontext.glVertex3fv(cube[3]);
+    glcontext.glColor3fv(color[4]);
+    glcontext.glVertex3fv(cube[4]);
 
-    ctx.glColor3fv(color[6]);
-    ctx.glVertex3fv(cube[6]);
-    ctx.glColor3fv(color[1]);
-    ctx.glVertex3fv(cube[1]);
-    ctx.glColor3fv(color[2]);
-    ctx.glVertex3fv(cube[2]);
-    ctx.glColor3fv(color[7]);
-    ctx.glVertex3fv(cube[7]);
+    glcontext.glColor3fv(color[6]);
+    glcontext.glVertex3fv(cube[6]);
+    glcontext.glColor3fv(color[1]);
+    glcontext.glVertex3fv(cube[1]);
+    glcontext.glColor3fv(color[2]);
+    glcontext.glVertex3fv(cube[2]);
+    glcontext.glColor3fv(color[7]);
+    glcontext.glVertex3fv(cube[7]);
 #else /* flat cube */
-    ctx.glColor3f(1.0, 0.0, 0.0);
-    ctx.glVertex3fv(cube[0]);
-    ctx.glVertex3fv(cube[1]);
-    ctx.glVertex3fv(cube[2]);
-    ctx.glVertex3fv(cube[3]);
+    glcontext.glColor3f(1.0, 0.0, 0.0);
+    glcontext.glVertex3fv(cube[0]);
+    glcontext.glVertex3fv(cube[1]);
+    glcontext.glVertex3fv(cube[2]);
+    glcontext.glVertex3fv(cube[3]);
 
-    ctx.glColor3f(0.0, 1.0, 0.0);
-    ctx.glVertex3fv(cube[3]);
-    ctx.glVertex3fv(cube[4]);
-    ctx.glVertex3fv(cube[7]);
-    ctx.glVertex3fv(cube[2]);
+    glcontext.glColor3f(0.0, 1.0, 0.0);
+    glcontext.glVertex3fv(cube[3]);
+    glcontext.glVertex3fv(cube[4]);
+    glcontext.glVertex3fv(cube[7]);
+    glcontext.glVertex3fv(cube[2]);
 
-    ctx.glColor3f(0.0, 0.0, 1.0);
-    ctx.glVertex3fv(cube[0]);
-    ctx.glVertex3fv(cube[5]);
-    ctx.glVertex3fv(cube[6]);
-    ctx.glVertex3fv(cube[1]);
+    glcontext.glColor3f(0.0, 0.0, 1.0);
+    glcontext.glVertex3fv(cube[0]);
+    glcontext.glVertex3fv(cube[5]);
+    glcontext.glVertex3fv(cube[6]);
+    glcontext.glVertex3fv(cube[1]);
 
-    ctx.glColor3f(0.0, 1.0, 1.0);
-    ctx.glVertex3fv(cube[5]);
-    ctx.glVertex3fv(cube[4]);
-    ctx.glVertex3fv(cube[7]);
-    ctx.glVertex3fv(cube[6]);
+    glcontext.glColor3f(0.0, 1.0, 1.0);
+    glcontext.glVertex3fv(cube[5]);
+    glcontext.glVertex3fv(cube[4]);
+    glcontext.glVertex3fv(cube[7]);
+    glcontext.glVertex3fv(cube[6]);
 
-    ctx.glColor3f(1.0, 1.0, 0.0);
-    ctx.glVertex3fv(cube[5]);
-    ctx.glVertex3fv(cube[0]);
-    ctx.glVertex3fv(cube[3]);
-    ctx.glVertex3fv(cube[4]);
+    glcontext.glColor3f(1.0, 1.0, 0.0);
+    glcontext.glVertex3fv(cube[5]);
+    glcontext.glVertex3fv(cube[0]);
+    glcontext.glVertex3fv(cube[3]);
+    glcontext.glVertex3fv(cube[4]);
 
-    ctx.glColor3f(1.0, 0.0, 1.0);
-    ctx.glVertex3fv(cube[6]);
-    ctx.glVertex3fv(cube[1]);
-    ctx.glVertex3fv(cube[2]);
-    ctx.glVertex3fv(cube[7]);
+    glcontext.glColor3f(1.0, 0.0, 1.0);
+    glcontext.glVertex3fv(cube[6]);
+    glcontext.glVertex3fv(cube[1]);
+    glcontext.glVertex3fv(cube[2]);
+    glcontext.glVertex3fv(cube[7]);
 #endif /* SHADED_CUBE */
 
-    ctx.glEnd();
+    glcontext.glEnd();
 
-    ctx.glMatrixMode(GL_MODELVIEW);
-    ctx.glRotatef(5.0, 1.0, 1.0, 1.0);
+    glcontext.glMatrixMode(GL_MODELVIEW);
+    glcontext.glRotatef(5.0, 1.0, 1.0, 1.0);
 }
 
 int
@@ -272,15 +274,15 @@ sdl_test_main(int argc, char *argv[])
         quit(2);
     }
 
-    /* Create OpenGL context */
-    context = SDL_GL_CreateContext(state->windows[0]);
-    if (!context) {
+    /* Create OpenGL sdl_glcontext */
+    sdl_glcontext = SDL_GL_CreateContext(state->windows[0]);
+    if (!sdl_glcontext) {
         SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "SDL_GL_CreateContext(): %s\n", SDL_GetError());
         quit(2);
     }
 
-    /* Important: call this *after* creating the context */
-    if (LoadContext(&ctx) < 0) {
+    /* Important: call this *after* creating the sdl_glcontext */
+    if (LoadContext(&glcontext) < 0) {
         SDL_Log("Could not load GL functions\n");
         quit(2);
         return 0;
@@ -303,10 +305,10 @@ sdl_test_main(int argc, char *argv[])
     SDL_GL_GetDrawableSize(state->windows[0], &dw, &dh);
     SDL_Log("Draw Size     : %d,%d\n", dw, dh);
     SDL_Log("\n");
-    SDL_Log("Vendor        : %s\n", ctx.glGetString(GL_VENDOR));
-    SDL_Log("Renderer      : %s\n", ctx.glGetString(GL_RENDERER));
-    SDL_Log("Version       : %s\n", ctx.glGetString(GL_VERSION));
-    SDL_Log("Extensions    : %s\n", ctx.glGetString(GL_EXTENSIONS));
+    SDL_Log("Vendor        : %s\n", glcontext.glGetString(GL_VENDOR));
+    SDL_Log("Renderer      : %s\n", glcontext.glGetString(GL_RENDERER));
+    SDL_Log("Version       : %s\n", glcontext.glGetString(GL_VERSION));
+    SDL_Log("Extensions    : %s\n", glcontext.glGetString(GL_EXTENSIONS));
     SDL_Log("\n");
 
     status = SDL_GL_GetAttribute(SDL_GL_RED_SIZE, &value);
@@ -366,14 +368,14 @@ sdl_test_main(int argc, char *argv[])
     }
 
     /* Set rendering settings */
-    ctx.glMatrixMode(GL_PROJECTION);
-    ctx.glLoadIdentity();
-    ctx.glOrtho(-2.0, 2.0, -2.0, 2.0, -20.0, 20.0);
-    ctx.glMatrixMode(GL_MODELVIEW);
-    ctx.glLoadIdentity();
-    ctx.glEnable(GL_DEPTH_TEST);
-    ctx.glDepthFunc(GL_LESS);
-    ctx.glShadeModel(GL_SMOOTH);
+    glcontext.glMatrixMode(GL_PROJECTION);
+    glcontext.glLoadIdentity();
+    glcontext.glOrtho(-2.0, 2.0, -2.0, 2.0, -20.0, 20.0);
+    glcontext.glMatrixMode(GL_MODELVIEW);
+    glcontext.glLoadIdentity();
+    glcontext.glEnable(GL_DEPTH_TEST);
+    glcontext.glDepthFunc(GL_LESS);
+    glcontext.glShadeModel(GL_SMOOTH);
 
     /* Main render loop */
     frames = 0;
@@ -389,9 +391,9 @@ sdl_test_main(int argc, char *argv[])
             int w, h;
             if (state->windows[i] == NULL)
                 continue;
-            SDL_GL_MakeCurrent(state->windows[i], context);
+            SDL_GL_MakeCurrent(state->windows[i], sdl_glcontext);
             SDL_GL_GetDrawableSize(state->windows[i], &w, &h);
-            ctx.glViewport(0, 0, w, h);
+            glcontext.glViewport(0, 0, w, h);
             Render();
             SDL_GL_SwapWindow(state->windows[i]);
         }
@@ -413,7 +415,7 @@ sdl_test_main(int argc, char *argv[])
 /* | _|| ' \/ _` | | _ \ _ \/ -_) _| / / '  \/ _` | ' \  | |\/| / _ \/ _` (_-< */
 /* |___|_||_\__,_| |___/___/\___\__|_\_\_|_|_\__,_|_||_| |_|  |_\___/\__,_/__/ */
 
-value_t fl_graphics_demo(value_t *args, uint32_t nargs)
+value_t fl_graphics_demo(value_t * args, uint32_t nargs)
 {
     argcount("graphics-demo", nargs, 0);
     printf("hit the graphics demo\n");
@@ -422,6 +424,14 @@ value_t fl_graphics_demo(value_t *args, uint32_t nargs)
     argv[1] = 0;
     sdl_test_main(1, argv);
     return FL_T;
+}
+
+value_t fl_static_SDL_context(value_t * args, uint32_t nargs)
+{
+    argcount("graphics-static-sdl-glcontext", nargs, 0);
+    printf("returning static sdl_glcontext\n");
+    value_t nt = cvalue(sdl_glcontext, sizeof(void*));
+    return nt;
 }
 
 static builtinspec_t graphics_info[] = {

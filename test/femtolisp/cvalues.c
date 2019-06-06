@@ -780,6 +780,7 @@ value_t cvalue_new(value_t *args, u_int32_t nargs)
     if (nargs < 1 || nargs > 2)
         argcount("c-value", nargs, 2);
     value_t type = args[0];
+    void * inspectable = ((void *)(type));
     fltype_t *ft = get_type(type);
     value_t cv;
     if (ft->eltype != NULL) {
@@ -802,6 +803,7 @@ value_t cvalue_new(value_t *args, u_int32_t nargs)
         if (nargs == 2)
             cvalue_init(ft, args[1], cptr(cv));
     }
+
     return cv;
 }
 
