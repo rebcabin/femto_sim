@@ -1,0 +1,1 @@
+/usr/bin/cc   -rdynamic CMakeFiles/testnative.dir/testnative.c.o CMakeFiles/testnative.dir/testnativex11.c.o  -o testnative -lSDL2_test -lSDL2-static 

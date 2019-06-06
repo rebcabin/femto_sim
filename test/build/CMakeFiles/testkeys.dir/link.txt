@@ -1,0 +1,1 @@
+/usr/bin/cc   -rdynamic CMakeFiles/testkeys.dir/testkeys.c.o  -o testkeys -lSDL2_test -lSDL2-static 

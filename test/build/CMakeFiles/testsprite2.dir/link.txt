@@ -1,0 +1,1 @@
+/usr/bin/cc   -rdynamic CMakeFiles/testsprite2.dir/testsprite2.c.o  -o testsprite2 -lSDL2_test -lSDL2-static 

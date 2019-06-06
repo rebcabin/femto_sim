@@ -1,0 +1,1 @@
+/usr/bin/cc   -rdynamic CMakeFiles/testdropfile.dir/testdropfile.c.o  -o testdropfile -lSDL2_test -lSDL2-static 

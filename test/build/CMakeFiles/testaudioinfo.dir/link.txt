@@ -1,0 +1,1 @@
+/usr/bin/cc   -rdynamic CMakeFiles/testaudioinfo.dir/testaudioinfo.c.o  -o testaudioinfo -lSDL2_test -lSDL2-static 

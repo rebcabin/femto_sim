@@ -1,0 +1,1 @@
+/usr/bin/cc   -rdynamic CMakeFiles/testviewport.dir/testviewport.c.o  -o testviewport -lSDL2_test -lSDL2-static 

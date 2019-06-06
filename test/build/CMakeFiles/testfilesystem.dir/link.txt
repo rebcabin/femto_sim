@@ -1,0 +1,1 @@
+/usr/bin/cc   -rdynamic CMakeFiles/testfilesystem.dir/testfilesystem.c.o  -o testfilesystem -lSDL2_test -lSDL2-static 

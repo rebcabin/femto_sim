@@ -1,0 +1,1 @@
+/usr/bin/cc   -rdynamic CMakeFiles/testplatform.dir/testplatform.c.o  -o testplatform -lSDL2_test -lSDL2-static 

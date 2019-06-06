@@ -1,0 +1,1 @@
+/usr/bin/cc   -rdynamic CMakeFiles/testbounds.dir/testbounds.c.o  -o testbounds -lSDL2_test -lSDL2-static 

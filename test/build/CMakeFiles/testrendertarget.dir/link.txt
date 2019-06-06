@@ -1,0 +1,1 @@
+/usr/bin/cc   -rdynamic CMakeFiles/testrendertarget.dir/testrendertarget.c.o  -o testrendertarget -lSDL2_test -lSDL2-static 

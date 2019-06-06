@@ -1,0 +1,1 @@
+/usr/bin/cc   -rdynamic CMakeFiles/testyuv.dir/testyuv.c.o CMakeFiles/testyuv.dir/testyuv_cvt.c.o  -o testyuv -lSDL2_test -lSDL2-static 

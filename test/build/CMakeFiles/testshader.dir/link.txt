@@ -1,0 +1,1 @@
+/usr/bin/cc   -rdynamic CMakeFiles/testshader.dir/testshader.c.o  -o testshader -lSDL2_test -lSDL2-static 

@@ -1,0 +1,1 @@
+/usr/bin/cc   -rdynamic CMakeFiles/controllermap.dir/controllermap.c.o  -o controllermap -lSDL2_test -lSDL2-static 

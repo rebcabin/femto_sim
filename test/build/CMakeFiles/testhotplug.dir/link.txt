@@ -1,0 +1,1 @@
+/usr/bin/cc   -rdynamic CMakeFiles/testhotplug.dir/testhotplug.c.o  -o testhotplug -lSDL2_test -lSDL2-static 

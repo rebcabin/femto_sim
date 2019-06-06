@@ -1,0 +1,1 @@
+/usr/bin/cc   -rdynamic CMakeFiles/testdisplayinfo.dir/testdisplayinfo.c.o  -o testdisplayinfo -lSDL2_test -lSDL2-static 

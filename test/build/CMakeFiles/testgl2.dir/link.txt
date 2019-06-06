@@ -1,0 +1,1 @@
+/usr/bin/cc   -rdynamic CMakeFiles/testgl2.dir/testgl2.c.o  -o testgl2 -lSDL2_test -lSDL2-static 

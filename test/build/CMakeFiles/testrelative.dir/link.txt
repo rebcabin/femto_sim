@@ -1,0 +1,1 @@
+/usr/bin/cc   -rdynamic CMakeFiles/testrelative.dir/testrelative.c.o  -o testrelative -lSDL2_test -lSDL2-static 

@@ -1,0 +1,1 @@
+/usr/bin/cc   -rdynamic CMakeFiles/testjoystick.dir/testjoystick.c.o  -o testjoystick -lSDL2_test -lSDL2-static 

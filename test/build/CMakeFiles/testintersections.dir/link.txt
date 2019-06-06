@@ -1,0 +1,1 @@
+/usr/bin/cc   -rdynamic CMakeFiles/testintersections.dir/testintersections.c.o  -o testintersections -lSDL2_test -lSDL2-static 

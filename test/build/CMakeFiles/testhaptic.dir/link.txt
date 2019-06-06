@@ -1,0 +1,1 @@
+/usr/bin/cc   -rdynamic CMakeFiles/testhaptic.dir/testhaptic.c.o  -o testhaptic -lSDL2_test -lSDL2-static 

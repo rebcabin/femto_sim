@@ -1,0 +1,1 @@
+/usr/bin/cc   -rdynamic CMakeFiles/testwm2.dir/testwm2.c.o  -o testwm2 -lSDL2_test -lSDL2-static 

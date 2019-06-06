@@ -1,0 +1,1 @@
+/usr/bin/cc   -rdynamic CMakeFiles/testmessage.dir/testmessage.c.o  -o testmessage -lSDL2_test -lSDL2-static 

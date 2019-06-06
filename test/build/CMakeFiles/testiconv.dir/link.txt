@@ -1,0 +1,1 @@
+/usr/bin/cc   -rdynamic CMakeFiles/testiconv.dir/testiconv.c.o  -o testiconv -lSDL2_test -lSDL2-static 

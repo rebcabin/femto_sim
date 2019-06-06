@@ -1,0 +1,1 @@
+/usr/bin/cc   -rdynamic CMakeFiles/testrendercopyex.dir/testrendercopyex.c.o  -o testrendercopyex -lSDL2_test -lSDL2-static 

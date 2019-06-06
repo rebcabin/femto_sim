@@ -1,0 +1,1 @@
+/usr/bin/cc   -rdynamic CMakeFiles/testtimer.dir/testtimer.c.o  -o testtimer -lSDL2_test -lSDL2-static 

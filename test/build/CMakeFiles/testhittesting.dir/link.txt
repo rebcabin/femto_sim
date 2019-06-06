@@ -1,0 +1,1 @@
+/usr/bin/cc   -rdynamic CMakeFiles/testhittesting.dir/testhittesting.c.o  -o testhittesting -lSDL2_test -lSDL2-static 

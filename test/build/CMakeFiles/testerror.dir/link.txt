@@ -1,0 +1,1 @@
+/usr/bin/cc   -rdynamic CMakeFiles/testerror.dir/testerror.c.o  -o testerror -lSDL2_test -lSDL2-static 

@@ -1,0 +1,1 @@
+/usr/bin/cc   -rdynamic CMakeFiles/SDL2_test_resoureces.dir/resources_dummy.c.o  -o SDL2_test_resoureces -lSDL2_test -lSDL2-static 

@@ -1,0 +1,1 @@
+/usr/bin/cc   -rdynamic CMakeFiles/testoverlay2.dir/testoverlay2.c.o CMakeFiles/testoverlay2.dir/testyuv_cvt.c.o  -o testoverlay2 -lSDL2_test -lSDL2-static 

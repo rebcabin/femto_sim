@@ -1,0 +1,1 @@
+/usr/bin/cc   -rdynamic CMakeFiles/testthread.dir/testthread.c.o  -o testthread -lSDL2_test -lSDL2-static 

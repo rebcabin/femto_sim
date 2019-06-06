@@ -1,0 +1,1 @@
+/usr/bin/cc   -rdynamic CMakeFiles/testgesture.dir/testgesture.c.o  -o testgesture -lSDL2_test -lSDL2-static 

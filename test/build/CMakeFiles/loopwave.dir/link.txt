@@ -1,0 +1,1 @@
+/usr/bin/cc   -rdynamic CMakeFiles/loopwave.dir/loopwave.c.o  -o loopwave -lSDL2_test -lSDL2-static 

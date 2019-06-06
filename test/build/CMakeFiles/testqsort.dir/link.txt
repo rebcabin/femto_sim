@@ -1,0 +1,1 @@
+/usr/bin/cc   -rdynamic CMakeFiles/testqsort.dir/testqsort.c.o  -o testqsort -lSDL2_test -lSDL2-static 
