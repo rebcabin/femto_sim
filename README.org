@@ -1,0 +1,12 @@
+* SDL + FEMTOLISP + RIGS OF RODS
+
+** LINUX ONLY
+
+To the test directory, I added femtolisp from Jeff Bezonson. I added
+'graphics.c,' which exposes a lisp built-in, "graphics-demo." After
+building and running "./flisp" in the test directory, type "(graphics-demo)" to
+see one of the standard SDL test programs running from lisp.
+
+I plan to add some physics pulled from Rigs-of-Rods, callable from lisp. This
+work will be manual labor because the original Rigs-of-Rods is a monolithic game
+rather than a collection of components.
