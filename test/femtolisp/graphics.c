@@ -426,20 +426,79 @@ value_t fl_graphics_demo(value_t * args, uint32_t nargs)
     return FL_T;
 }
 
+static value_t    sdl_glcontext_sym;
+static fltype_t * sdl_glcontext_type;
+
 value_t fl_static_SDL_context(value_t * args, uint32_t nargs)
 {
     argcount("graphics-static-sdl-glcontext", nargs, 0);
     printf("returning static sdl_glcontext\n");
-    value_t nt = cvalue(sdl_glcontext, sizeof(void*));
+    value_t nt = cvalue(sdl_glcontext_type, 2 * sizeof(void*)); // bbeckman: why 2?
     return nt;
 }
 
 static builtinspec_t graphics_info[] = {
-    { "graphics-demo", fl_graphics_demo },
+    { "graphics-demo",                 fl_graphics_demo },
+    { "graphics-static-sdl-glcontext", fl_static_SDL_context },
     { NULL, NULL }
 };
 
+void print_sdl_glcontext(value_t self, ios_t * fd)
+{
+    const SDL_GLContext pc = ((SDL_GLContext)(cv_data((cvalue_t*)ptr(self))));
+    // StackOverflow Q 436367 for old-school safe printing.
+    char * buf = 0;
+    size_t bufsize = 0;
+    size_t sz;
+
+    const char * format="%d-byte opaque pointer: 0x%08X)\n";
+    if (16 == sizeof(pc)) {
+        format="%d-byte opaque pointer: 0x%016X)\n";
+    } else {
+        format="%d-byte opaque pointer: 0x%0X)\n";
+    }
+
+    sz = snprintf (buf, bufsize, format, sizeof(pc), pc);
+
+    buf = malloc (sz + 1);
+    if ( ! buf ) {
+        lerror(MemoryError, "sdl_glerror: can't allocate snprintf buffer");
+        return;
+    }
+    bufsize = sz + 1;
+    buf[bufsize - 1] = '\0';
+    sz = snprintf (buf, bufsize, format, sizeof(pc), pc);
+
+    fl_print_str("#sdl_glcontext(", fd);
+    fl_print_str(buf, fd);
+
+    free (buf);
+    return;
+}
+
+static cvtable_t sdl_glcontext_vtable = {print_sdl_glcontext, NULL, NULL, NULL};
+
+// bbeckman: Following the example in table.c for extending lisp with
+// user-defined types (UDTs). We need sdl_glcontext and glcontext.
+//
+// VTables have a canonical form; from flisp.h:
+//
+//     typedef struct {
+//         void (*print)(value_t self, ios_t *f);
+//         void (*relocate)(value_t oldv, value_t newv);
+//         void (*finalize)(value_t self);
+//         void (*print_traverse)(value_t self);
+//     } cvtable_t;
+//
+// TODO: Consider making the finalizer for sdl-glcontext call "close" above.
+
 void graphics_init(void)
 {
+    sdl_glcontext_sym = symbol("graphics-sdl-glcontext");
+    sdl_glcontext_type = define_opaque_type(sdl_glcontext_sym,
+                                            sizeof(SDL_GLContext),
+                                            & sdl_glcontext_vtable, // & vtable
+                                            NULL  // init-func
+                                            );
     assign_global_builtins(graphics_info);
 }
