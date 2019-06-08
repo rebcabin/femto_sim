@@ -5,20 +5,24 @@
                              *graphics-sdl-log-priority-info*)
 
 ;; CHECK CYCLIC IDEMPOTENCY:
+
+;; This script maintains an invariant each time it runs, with the possible
+;; exception of the first time, so long as there is no intervening interaction
+;; with SDL. That invariant is that the last value of SDL_GLContext, from the C
+;; layer, saved during the last iteration of the script, must now be the first
+;; value of the same state variable.
 ;;
-;; If running this script multiple times consecutively, with no other
-;; intervening interactions with the C layer, check that the old SDL_GLContext
-;; (in the C layer), was not disturbed. Save the SDL_GLContext created by
-;; 'graphics-demo' in the global *last-sdl-glcontext*. Run this script again.
-;; During each iteration of the script, check that the SDL_GLContext inside the
-;; C layer, before the new run of 'graphics-demo,' has that same old value saved
-;; last iteration. Initialize *last-sdl-glcontext* to 'nil' to avoid checking
-;; against it the first time around. If this script runs before any other
-;; interaction with the C layer, then SDL_GLContext will be 0 (C NULL), but we
-;; want to run this script potentially after other interactions. In that case,
-;; there is no way to know the old value of SDL_GLContext in the C layer. Give
-;; up on the checking against 0 (C NULL) to gain flexibility on when to run this
-;; script.
+;; Save the SDL_GLContext created by 'graphics-demo' in the lisp global
+;; *last-sdl-glcontext*. Run this script again. Check that SDL_GLContext, before
+;; the new run of 'graphics-demo,' has the old value saved last iteration.
+;;
+;; Initialize *last-sdl-glcontext* to 'nil' to avoid checking against it the
+;; first time around. If this script runs before any other interaction with the
+;; C layer, then SDL_GLContext will be 0 (C NULL), but we want to run this
+;; script potentially after other interactions. In that case, there is no way to
+;; know the old value of SDL_GLContext in the C layer. Give up on the checking
+;; against 0 (C NULL) to gain flexibility to run this script after other code
+;; interacts with the C layer.
 
 (if (not (bound? '*last-sdl-glcontext*))
     (define *last-sdl-glcontext* '()))
