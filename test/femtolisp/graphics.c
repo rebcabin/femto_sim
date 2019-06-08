@@ -378,7 +378,7 @@ sdl_test_main(int argc, char *argv[])
     frames = 0;
     then = SDL_GetTicks();
     done = 0;
-    while (!done && frames < 10000) {
+    while (!done && frames < 2000) {
         /* Check for events */
         ++frames;
         while (SDL_PollEvent(&event)) {
@@ -430,14 +430,29 @@ value_t fl_graphics_demo(value_t * args, uint32_t nargs)
 /* | |_ _  _ _ __  ___ ___  __ _ _ _  __| | (_)_ _  __| |_ __ _ _ _  __ ___ ___ */
 /* |  _| || | '_ \/ -_|_-< / _` | ' \/ _` | | | ' \(_-<  _/ _` | ' \/ _/ -_|_-< */
 /*  \__|\_, | .__/\___/__/ \__,_|_||_\__,_| |_|_||_/__/\__\__,_|_||_\__\___/__/ */
-/*      |__/|_| */
+/*      |__/|_|                                                                 */
+
+// bbeckman: Following the example in table.c for extending lisp with
+// user-defined types (UDTs). We need sdl_glcontext and glcontext and some
+// others.
+//
+// VTables have a canonical form; from flisp.h:
+//
+//     typedef struct {
+//         void (*print)(value_t self, ios_t *f);
+//         void (*relocate)(value_t oldv, value_t newv);
+//         void (*finalize)(value_t self);
+//         void (*print_traverse)(value_t self);
+//     } cvtable_t;
+//
+// TODO: Consider making the finalizer for sdl-glcontext call "close" above.
 
 // bbeckman: TODO: Move all this to a general-purpose utility library.
 
-static inline value_t instance(fltype_t * ptype)
+static inline value_t instance(fltype_t * p_type)
 {
     // bbeckman: TODO why 2 * ?
-    return cvalue(ptype, 2 * sizeof(void*));
+    return cvalue(p_type, 2 * sizeof(void*));
 }
 
 static inline void ** pp_data_slot(value_t instance)
@@ -445,21 +460,18 @@ static inline void ** pp_data_slot(value_t instance)
     return cv_data((cvalue_t*)ptr(instance));
 }
 
-static inline value_t poke_pointer_into_instance(fltype_t * ptype, void * datum)
+static inline value_t poke_pointer_into_instance(fltype_t * p_type, void * p_datum)
 {
-    value_t inst_ = instance(ptype);
+    value_t inst_ = instance(p_type);
     void ** ppc = pp_data_slot(inst_);
-    * ppc = datum;
+    * ppc = p_datum;
     return inst_;
 }
 
-/*         _ _         _            _           _    */
-/*  ___ __| | |   __ _| |__ ___ _ _| |_ _____ _| |_  */
-/* (_-</ _` | |  / _` | / _/ _ \ ' \  _/ -_) \ /  _| */
-/* /__/\__,_|_|__\__, |_\__\___/_||_\__\___/_\_\\__| */
-/*           |___|___/                               */
-
-/* Illustrates boilerplate for user-defined types (UDTs) */
+/*  ___ ___  _       ___ _    ___         _           _    */
+/* / __|   \| |     / __| |  / __|___ _ _| |_ _____ _| |_  */
+/* \__ \ |) | |__  | (_ | |_| (__/ _ \ ' \  _/ -_) \ /  _| */
+/* |___/___/|____|  \___|____\___\___/_||_\__\___/_\_\\__| */
 
 static value_t    sdl_glcontext_sym;
 static fltype_t * sdl_glcontext_type;
@@ -468,7 +480,6 @@ value_t fl_is_sdl_glcontext(value_t * args, uint32_t nargs)
 {
     argcount("graphics-is-sdl-glcontext", nargs, 1);
     value_t candidate = args[0];
-
     return (iscvalue(candidate) &&
             sdl_glcontext_type == cv_class((cvalue_t*)ptr(candidate))) ? FL_T : FL_F;
 }
@@ -477,9 +488,9 @@ value_t fl_get_sdl_glcontext(value_t * args, uint32_t nargs)
 {
     argcount("graphics-get-sdl-glcontext", nargs, 1);
     value_t v = args[0];
-    cvalue_t * datum = ((cvalue_t *)(ptr(v)));
-    assert(iscvalue(v) && (sdl_glcontext_type == cv_class(datum)));
-    value_t result = fixnum((fixnum_t)( * ((void**)cv_data(datum)) ));
+    cvalue_t * p_datum = ((cvalue_t *)(ptr(v)));
+    assert(iscvalue(v) && (sdl_glcontext_type == cv_class(p_datum)));
+    value_t result = fixnum((fixnum_t)( * ((void**)cv_data(p_datum)) ));
     return result;
 }
 
@@ -490,16 +501,6 @@ value_t fl_static_SDL_context(value_t * args, uint32_t nargs)
                                                   sdl_glcontext);
     return instance;
 }
-
-static builtinspec_t graphics_info[] = {
-    { "graphics-demo",                    fl_graphics_demo },
-    { "graphics-is-sdl-glcontext",        fl_is_sdl_glcontext},
-    { "graphics-get-sdl-glcontext",       fl_get_sdl_glcontext},
-    { "graphics-static-sdl-glcontext",    fl_static_SDL_context },
-    { NULL, NULL }
-};
-
-// bbeckman: TODO: The prints show pointers with the upper 8 hexits zero.
 
 void print_sdl_glcontext(value_t self, ios_t * fd)
 {
@@ -536,33 +537,112 @@ void print_sdl_glcontext(value_t self, ios_t * fd)
     return;
 }
 
-static cvtable_t sdl_glcontext_vtable = {print_sdl_glcontext, // print
-                                         NULL, // relocate
-                                         NULL, // finalize
-                                         NULL  // print_traverse
-};
+static cvtable_t sdl_glcontext_vtable =
+    {print_sdl_glcontext, // print
+     NULL, // relocate
+     NULL, // finalize
+     NULL  // print_traverse
+    };
 
-// bbeckman: Following the example in table.c for extending lisp with
-// user-defined types (UDTs). We need sdl_glcontext and glcontext.
-//
-// VTables have a canonical form; from flisp.h:
-//
-//     typedef struct {
-//         void (*print)(value_t self, ios_t *f);
-//         void (*relocate)(value_t oldv, value_t newv);
-//         void (*finalize)(value_t self);
-//         void (*print_traverse)(value_t self);
-//     } cvtable_t;
-//
-// TODO: Consider making the finalizer for sdl-glcontext call "close" above.
+static void sdl_glcontext_UDT_init()
+{
+    sdl_glcontext_sym = symbol("graphics-sdl-glcontext");
+    sdl_glcontext_type = define_opaque_type
+        (sdl_glcontext_sym,
+         sizeof(SDL_GLContext),
+         & sdl_glcontext_vtable, // & vtable
+         NULL  // init-func
+         );
+}
+
+/*  ___ ___  _      _                   _ */
+/* / __|   \| |    | |   ___  __ _ __ _(_)_ _  __ _ */
+/* \__ \ |) | |__  | |__/ _ \/ _` / _` | | ' \/ _` | */
+/* |___/___/|____| |____\___/\__, \__, |_|_||_\__, | */
+/*                           |___/|___/       |___/ */
+
+/* value_t test_symbol = symbol("*graphics-test-global*"); */
+/* setc(test_symbol, fixnum(42)); */
+
+value_t sdl_log_category_application;
+value_t sdl_log_priority_info;
+
+value_t fl_sdl_logsetpriority(value_t * args, uint32_t nargs)
+{
+    argcount("graphics-sdl-logsetpriority", nargs, 2);
+    value_t category = args[0];
+    if ( ! fl_isnumber(category) ) {
+        type_error("graphics-sdl_logsetpriority:category", "number", category);
+    }
+    value_t priority = args[1];
+    if ( ! fl_isnumber(priority) ) {
+        type_error("graphics-sdl_logsetpriority:number", "number", priority);
+    }
+    SDL_LogSetPriority(numval(category), numval(priority));
+    return FL_T;
+}
+
+static void sdl_logging_UDT_init()
+{
+    sdl_log_category_application =
+        symbol("*graphics-sdl-log-category-application*");
+    setc(sdl_log_category_application, fixnum(SDL_LOG_CATEGORY_APPLICATION));
+
+    sdl_log_priority_info = symbol("*graphics-sdl-log-priority-info*");
+    setc(sdl_log_priority_info, fixnum(SDL_LOG_PRIORITY_INFO));
+}
+
+
+/*  ___ ___  _      _____       _     ___ _        _ */
+/* / __|   \| |    |_   _|__ __| |_  / __| |_ __ _| |_ ___ */
+/* \__ \ |) | |__    | |/ -_|_-<  _| \__ \  _/ _` |  _/ -_) */
+/* |___/___/|____|   |_|\___/__/\__| |___/\__\__,_|\__\___| */
+
+static value_t    sdltest_commonstate_sym;
+static fltype_t * sdltest_commonstate_type;
+
+static cvtable_t sdltest_commonstate_vtable =
+    {NULL, // print
+     NULL, // relocate
+     NULL, // finalize
+     NULL  // print_traverse
+    };
+
+static void sdltest_commonstate_UDT_init()
+{
+    sdltest_commonstate_sym = symbol("graphics-sdltest-commonstate");
+    sdltest_commonstate_type = define_opaque_type
+        (sdltest_commonstate_sym,
+         sizeof(SDLTest_CommonState),
+         & sdltest_commonstate_vtable,
+         NULL // init-func
+         );
+}
+
+/*                     _    _         _      _ _    */
+/*  __ _ _ _ __ _ _ __| |_ (_)__ ___ (_)_ _ (_) |_  */
+/* / _` | '_/ _` | '_ \ ' \| / _(_-< | | ' \| |  _| */
+/* \__, |_| \__,_| .__/_||_|_\__/__/ |_|_||_|_|\__| */
+/* |___/         |_|                                */
+
+static builtinspec_t graphics_info[] =
+    {
+     { "graphics-demo",                    fl_graphics_demo },
+
+     { "graphics-is-sdl-glcontext",        fl_is_sdl_glcontext },
+     { "graphics-get-sdl-glcontext",       fl_get_sdl_glcontext },
+     { "graphics-static-sdl-glcontext",    fl_static_SDL_context },
+
+     { "graphics-sdl-logsetpriority",      fl_sdl_logsetpriority },
+
+     { NULL, NULL }
+    };
 
 void graphics_init(void)
 {
-    sdl_glcontext_sym = symbol("graphics-sdl-glcontext");
-    sdl_glcontext_type = define_opaque_type(sdl_glcontext_sym,
-                                            sizeof(SDL_GLContext),
-                                            & sdl_glcontext_vtable, // & vtable
-                                            NULL  // init-func
-                                            );
+    sdl_glcontext_UDT_init();
+    sdltest_commonstate_UDT_init();
+    sdl_logging_UDT_init();
+
     assign_global_builtins(graphics_info);
 }
