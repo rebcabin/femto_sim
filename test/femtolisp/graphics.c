@@ -5,17 +5,17 @@
 #include <assert.h>
 #include <sys/types.h>
 #include <setjmp.h>
+#include <stdio.h>
+#include <math.h>
+
 #include "llt.h"
 #include "flisp.h"
 #include "equalhash.h"
 
-/*  ___ ___         _                     __  __         _     */
-/* | _ ) _ ) ___ __| |___ __  __ _ _ _   |  \/  |___  __| |___ */
-/* | _ \ _ \/ -_) _| / / '  \/ _` | ' \  | |\/| / _ \/ _` (_-< */
-/* |___/___/\___\__|_\_\_|_|_\__,_|_||_| |_|  |_\___/\__,_/__/ */
-
-#include <stdio.h>
-#include <math.h>
+/*   ___                       _   ___                 */
+/*  / __|__ _ _ _  _ _  ___ __| | |   \ ___ _ __  ___  */
+/* | (__/ _` | ' \| ' \/ -_) _` | | |) / -_) '  \/ _ \ */
+/*  \___\__,_|_||_|_||_\___\__,_| |___/\___|_|_|_\___/ */
 
 #include "SDL_opengl.h"
 #include "SDL_test_common.h"
@@ -29,9 +29,9 @@ typedef struct GL_Context
 
 #define SHADED_CUBE
 
-static SDLTest_CommonState *state;
-static SDL_GLContext sdl_glcontext; // of type void*; see SDL_video.h
-static GL_Context glcontext;
+static SDLTest_CommonState * state;
+static SDL_GLContext         sdl_glcontext; // of type void *; see SDL_video.h
+static GL_Context            glcontext;
 
 static int LoadContext(GL_Context * data)
 {
@@ -59,8 +59,6 @@ static int LoadContext(GL_Context * data)
 #undef SDL_PROC
     return 0;
 }
-
-
 
 static void
 close()
@@ -274,7 +272,6 @@ sdl_test_main(int argc, char *argv[])
         quit(2);
     }
 
-    /* Create OpenGL sdl_glcontext */
     sdl_glcontext = SDL_GL_CreateContext(state->windows[0]);
     if (!sdl_glcontext) {
         SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "SDL_GL_CreateContext(): %s\n", SDL_GetError());
@@ -410,10 +407,13 @@ sdl_test_main(int argc, char *argv[])
     return 0;
 }
 
-/*  ___         _   ___ ___         _                     __  __         _     */
-/* | __|_ _  __| | | _ ) _ ) ___ __| |___ __  __ _ _ _   |  \/  |___  __| |___ */
-/* | _|| ' \/ _` | | _ \ _ \/ -_) _| / / '  \/ _` | ' \  | |\/| / _ \/ _` (_-< */
-/* |___|_||_\__,_| |___/___/\___\__|_\_\_|_|_\__,_|_||_| |_|  |_\___/\__,_/__/ */
+/*   __          _         _     _                     _   _           */
+/*  / _|___ _ __| |_ ___  (_)_ _| |_ ___ __ _ _ _ __ _| |_(_)___ _ _   */
+/* |  _/ -_) '  \  _/ _ \ | | ' \  _/ -_) _` | '_/ _` |  _| / _ \ ' \  */
+/* |_| \___|_|_|_\__\___/ |_|_||_\__\___\__, |_| \__,_|\__|_\___/_||_| */
+/*                                      |___/                          */
+
+/* Run the canned demo. */
 
 value_t fl_graphics_demo(value_t * args, uint32_t nargs)
 {
@@ -426,48 +426,108 @@ value_t fl_graphics_demo(value_t * args, uint32_t nargs)
     return FL_T;
 }
 
+/*  _                                    _   _         _                        */
+/* | |_ _  _ _ __  ___ ___  __ _ _ _  __| | (_)_ _  __| |_ __ _ _ _  __ ___ ___ */
+/* |  _| || | '_ \/ -_|_-< / _` | ' \/ _` | | | ' \(_-<  _/ _` | ' \/ _/ -_|_-< */
+/*  \__|\_, | .__/\___/__/ \__,_|_||_\__,_| |_|_||_/__/\__\__,_|_||_\__\___/__/ */
+/*      |__/|_| */
+
+// bbeckman: TODO: Move all this to a general-purpose utility library.
+
+static inline value_t instance(fltype_t * ptype)
+{
+    // bbeckman: TODO why 2 * ?
+    return cvalue(ptype, 2 * sizeof(void*));
+}
+
+static inline void ** pp_data_slot(value_t instance)
+{
+    return cv_data((cvalue_t*)ptr(instance));
+}
+
+static inline value_t poke_pointer_into_instance(fltype_t * ptype, void * datum)
+{
+    value_t inst_ = instance(ptype);
+    void ** ppc = pp_data_slot(inst_);
+    * ppc = datum;
+    return inst_;
+}
+
+/*         _ _         _            _           _    */
+/*  ___ __| | |   __ _| |__ ___ _ _| |_ _____ _| |_  */
+/* (_-</ _` | |  / _` | / _/ _ \ ' \  _/ -_) \ /  _| */
+/* /__/\__,_|_|__\__, |_\__\___/_||_\__\___/_\_\\__| */
+/*           |___|___/                               */
+
+/* Illustrates boilerplate for user-defined types (UDTs) */
+
 static value_t    sdl_glcontext_sym;
 static fltype_t * sdl_glcontext_type;
+
+value_t fl_is_sdl_glcontext(value_t * args, uint32_t nargs)
+{
+    argcount("graphics-is-sdl-glcontext", nargs, 1);
+    value_t candidate = args[0];
+
+    return (iscvalue(candidate) &&
+            sdl_glcontext_type == cv_class((cvalue_t*)ptr(candidate))) ? FL_T : FL_F;
+}
+
+value_t fl_get_sdl_glcontext(value_t * args, uint32_t nargs)
+{
+    argcount("graphics-get-sdl-glcontext", nargs, 1);
+    value_t v = args[0];
+    cvalue_t * datum = ((cvalue_t *)(ptr(v)));
+    assert(iscvalue(v) && (sdl_glcontext_type == cv_class(datum)));
+    value_t result = fixnum((fixnum_t)( * ((void**)cv_data(datum)) ));
+    return result;
+}
 
 value_t fl_static_SDL_context(value_t * args, uint32_t nargs)
 {
     argcount("graphics-static-sdl-glcontext", nargs, 0);
-    printf("returning static sdl_glcontext\n");
-    value_t nt = cvalue(sdl_glcontext_type, 2 * sizeof(void*)); // bbeckman: why 2?
-    return nt;
+    value_t instance = poke_pointer_into_instance(sdl_glcontext_type,
+                                                  sdl_glcontext);
+    return instance;
 }
 
 static builtinspec_t graphics_info[] = {
-    { "graphics-demo",                 fl_graphics_demo },
-    { "graphics-static-sdl-glcontext", fl_static_SDL_context },
+    { "graphics-demo",                    fl_graphics_demo },
+    { "graphics-is-sdl-glcontext",        fl_is_sdl_glcontext},
+    { "graphics-get-sdl-glcontext",       fl_get_sdl_glcontext},
+    { "graphics-static-sdl-glcontext",    fl_static_SDL_context },
     { NULL, NULL }
 };
 
+// bbeckman: TODO: The prints show pointers with the upper 8 hexits zero.
+
 void print_sdl_glcontext(value_t self, ios_t * fd)
 {
-    const SDL_GLContext pc = ((SDL_GLContext)(cv_data((cvalue_t*)ptr(self))));
+    const SDL_GLContext * pc = ((SDL_GLContext *)(cv_data((cvalue_t*)ptr(self))));
     // StackOverflow Q 436367 for old-school safe printing.
     char * buf = 0;
     size_t bufsize = 0;
     size_t sz;
 
-    const char * format="%d-byte opaque pointer: 0x%08X)\n";
-    if (16 == sizeof(pc)) {
-        format="%d-byte opaque pointer: 0x%016X)\n";
+    const char * format="0x%016X)\n";
+    if (4 == sizeof(*pc)) {
+        format="0x%08X)\n";
+    } else if (8 == sizeof(*pc)) {
+        ; // do nothing
     } else {
-        format="%d-byte opaque pointer: 0x%0X)\n";
+        format="0x%0X)\n";
     }
 
-    sz = snprintf (buf, bufsize, format, sizeof(pc), pc);
+    sz = snprintf (buf, bufsize, format, *pc);
 
     buf = malloc (sz + 1);
     if ( ! buf ) {
-        lerror(MemoryError, "sdl_glerror: can't allocate snprintf buffer");
+        lerror(MemoryError, "print_sdl_glcontext error: can't allocate snprintf buffer");
         return;
     }
     bufsize = sz + 1;
     buf[bufsize - 1] = '\0';
-    sz = snprintf (buf, bufsize, format, sizeof(pc), pc);
+    sz = snprintf (buf, bufsize, format, *pc);
 
     fl_print_str("#sdl_glcontext(", fd);
     fl_print_str(buf, fd);
@@ -476,7 +536,11 @@ void print_sdl_glcontext(value_t self, ios_t * fd)
     return;
 }
 
-static cvtable_t sdl_glcontext_vtable = {print_sdl_glcontext, NULL, NULL, NULL};
+static cvtable_t sdl_glcontext_vtable = {print_sdl_glcontext, // print
+                                         NULL, // relocate
+                                         NULL, // finalize
+                                         NULL  // print_traverse
+};
 
 // bbeckman: Following the example in table.c for extending lisp with
 // user-defined types (UDTs). We need sdl_glcontext and glcontext.
